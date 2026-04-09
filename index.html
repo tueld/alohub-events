@@ -767,8 +767,7 @@ a{text-decoration:none;color:inherit}
 // CONFIG — заполнить перед деплоем
 // ════════════════════════════════
 var API_CONFIG = {
-  endpoint: 'https://api.alohub.vn/api/flows/webhook/1731/tech-talk',
-  apiKey:   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NzU3MjA1NTEsImV4cCI6MTgwNzI1NjYxMSwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiYWRtaW4uYWxvaHViIiwiYXBpS2V5IjoidHFmZ2ZoaXRjcmJpcnhmbW5pbWtveHpmdXNubW1sIiwidGVuYW50SWQiOiIxNzMxIn0.fkMJbiJ7ZzgkrTHT5UpwfqjzI783iINKW18NELKE7wo',
+  endpoint: '/api/register',
   nameField:  'name',
   phoneField: 'phone'
 };
@@ -811,9 +810,7 @@ function submitToAPI(name, phone, successCb, errorCb) {
   fetch(API_CONFIG.endpoint, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'accept': '*/*',
-      'X-access-token': API_CONFIG.apiKey
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(body)
   })
