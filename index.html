@@ -741,29 +741,60 @@ a{text-decoration:none;color:inherit}
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-function updateCountdown(){
-  const target=new Date('2026-04-22T13:00:00Z'); // 20:00 ICT = 13:00 UTC
-  const diff=target-new Date();
-  if(diff<=0){document.getElementById('countdown').innerHTML='<div style="color:var(--green);font-weight:700;font-size:13px;text-align:center;padding:10px 0;grid-column:1/-1">Event đang diễn ra!</div>';return;}
-  const d=Math.floor(diff/864e5),h=Math.floor((diff%864e5)/36e5),m=Math.floor((diff%36e5)/6e4),s=Math.floor((diff%6e4)/1e3);
-  document.getElementById('cd-d').textContent=String(d).padStart(2,'0');
-  document.getElementById('cd-h').textContent=String(h).padStart(2,'0');
-  document.getElementById('cd-m').textContent=String(m).padStart(2,'0');
-  document.getElementById('cd-s').textContent=String(s).padStart(2,'0');
+<script>
+function updateCountdown() {
+  var target = new Date('2026-04-22T13:00:00Z'); // 20:00 ICT = 13:00 UTC
+  var diff = target - new Date();
+  if (diff <= 0) {
+    document.getElementById('countdown').innerHTML = '<div style="color:#047857;font-weight:700;font-size:13px;text-align:center;padding:10px 0;grid-column:1/-1">Event đang diễn ra!</div>';
+    return;
+  }
+  var d = Math.floor(diff / 86400000);
+  var h = Math.floor((diff % 86400000) / 3600000);
+  var m = Math.floor((diff % 3600000) / 60000);
+  var s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-d').textContent = String(d).padStart(2, '0');
+  document.getElementById('cd-h').textContent = String(h).padStart(2, '0');
+  document.getElementById('cd-m').textContent = String(m).padStart(2, '0');
+  document.getElementById('cd-s').textContent = String(s).padStart(2, '0');
 }
-updateCountdown();setInterval(updateCountdown,1000);
+updateCountdown();
+setInterval(updateCountdown, 1000);
 
-function handleReg(){
-  const n=document.querySelector('.qr-field input[type=text]').value.trim();
-  const e=document.querySelector('.qr-field input[type=email]').value.trim();
-  const t=document.querySelector('.qr-field input[type=tel]').value.trim();
-  if(!n||!e||!t){alert('Vui lòng điền đầy đủ họ tên, email và số điện thoại.');return;}
-  document.querySelector('.reg-card-body').innerHTML='<div style="padding:24px;text-align:center"><div style="width:52px;height:52px;background:var(--green-lt);border:2px solid var(--green-bd);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><svg width="24" height="24" fill="none" stroke="#047857" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><div style="font-size:17px;font-weight:800;color:var(--ink2);margin-bottom:6px">Đăng ký thành công!</div><div style="font-size:13px;color:var(--mu);line-height:1.65">Admin sẽ liên hệ Zalo để gửi link Zoom + tài liệu trước ngày 22/04. Nhớ thêm vào lịch nhé!</div></div>';
-}
-function handleRegCTA(){
-  const e=document.getElementById('cta-phone').value.trim();
-  if(!e){alert('Vui lòng nhập số điện thoại.');return;}
-  document.querySelector('.cta-form').outerHTML='<div style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:14px 24px;color:#86EFAC;font-weight:600;font-size:15px;text-align:center;max-width:480px;margin:0 auto">Đăng ký thành công! Kiểm tra email để nhận link Zoom.</div>';
+function handleReg() {
+  var name = document.querySelector('.qr-field input[type=text]').value.trim();
+  var tel  = document.querySelector('.qr-field input[type=tel]').value.trim();
+  if (!name || !tel) { alert('Vui lòng điền đầy đủ họ tên và số điện thoại.'); return; }
+  document.querySelector('.reg-card-body').innerHTML =
+    '<div style="padding:24px;text-align:center">' +
+    '<div style="width:52px;height:52px;background:#ECFDF5;border:2px solid #6EE7B7;border-radius:50%;' +
+    'display:flex;align-items:center;justify-content:center;margin:0 auto 12px">' +
+    '<svg width="24" height="24" fill="none" stroke="#047857" stroke-width="2.5" stroke-linecap="round">' +
+    '<polyline points="20 6 9 17 4 12"/></svg></div>' +
+    '<div style="font-size:17px;font-weight:800;color:#1F2937;margin-bottom:6px">Đăng ký thành công!</div>' +
+    '<div style="font-size:13px;color:#4B5563;line-height:1.65">' +
+    'Admin sẽ liên hệ Zalo để gửi link Zoom trước ngày 22/04. Nhớ thêm vào lịch nhé!</div></div>';
 }
 
-const io=new IntersectionObserver(e=>e.forEach(en=>{if(en.isIntersecting){en.target.style.opacity='1';en.target.style.transform='translateY(0)';}}),{threshold
+function handleRegCTA() {
+  var tel = document.getElementById('cta-phone').value.trim();
+  if (!tel) { alert('Vui lòng nhập số điện thoại.'); return; }
+  document.querySelector('.cta-form').outerHTML =
+    '<div style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:12px;' +
+    'padding:14px 24px;color:#86EFAC;font-weight:600;font-size:15px;text-align:center;max-width:480px;margin:0 auto">' +
+    'Đăng ký thành công! Admin sẽ liên hệ Zalo để gửi link Zoom.</div>';
+}
+
+var io = new IntersectionObserver(function(entries) {
+  entries.forEach(function(en) {
+    if (en.isIntersecting) {
+      en.target.style.opacity = '1';
+      en.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.topic-item,.why-card,.speaker-card,.agenda-item,.hook-card').forEach(function(el) {
+  el.style.cssText = 'opacity:0;transform:translateY(20px);transition:all .5s ease';
+  io.observe(el);
+});
+</script>
