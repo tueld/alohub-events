@@ -190,6 +190,17 @@ a{text-decoration:none;color:inherit}
 .cta-inner h2{font-size:clamp(26px,3.5vw,40px);font-weight:900;color:#fff;line-height:1.1;margin-bottom:12px;letter-spacing:-.5px}
 .cta-inner p{font-size:15px;color:rgba(255,255,255,.6);margin-bottom:28px;line-height:1.7}
 .cta-form{display:flex;gap:10px;max-width:480px;margin:0 auto 12px}
+.cta-form-wrap{max-width:520px;margin:0 auto 12px;display:flex;flex-direction:column;gap:10px}
+.cta-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cta-field-group{display:flex;flex-direction:column;gap:4px}
+.cta-field-group input{font-family:var(--f);font-size:14px;color:var(--ink);background:#fff;border:1.5px solid rgba(255,255,255,.15);border-radius:10px;padding:13px 16px;outline:none;transition:all .15s;width:100%}
+.cta-field-group input:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(63,95,230,.2)}
+.cta-field-group input::placeholder{color:#9CA3AF}
+.cta-field-group input.has-error{border-color:#EF4444 !important;box-shadow:0 0 0 3px rgba(239,68,68,.15) !important}
+.field-error{font-size:11px;color:#FCA5A5;min-height:16px;padding-left:2px}
+.cta-submit-btn{width:100%;justify-content:center;padding:14px}
+.qr-field input.has-error{border-color:#EF4444 !important;box-shadow:0 0 0 3px rgba(239,68,68,.1) !important}
+.qr-field .field-error{font-size:11px;color:#FCA5A5;min-height:15px;margin-top:3px;padding-left:2px}
 .cta-form input{flex:1;font-family:var(--f);font-size:14px;color:var(--ink);background:#fff;border:1.5px solid rgba(255,255,255,.1);border-radius:10px;padding:13px 16px;outline:none}
 .cta-form input:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(63,95,230,.2)}
 .cta-form input::placeholder{color:var(--mu)}
@@ -233,6 +244,7 @@ a{text-decoration:none;color:inherit}
   .why-grid{grid-template-columns:1fr}
   .speakers-grid{grid-template-columns:1fr}
   .cta-form{flex-direction:column}
+  .cta-field-row{grid-template-columns:1fr}
   .nav-date{display:none}
 }
 @media(max-width:480px){
@@ -374,8 +386,8 @@ a{text-decoration:none;color:inherit}
             <div class="cd-item"><div class="cd-num" id="cd-m">--</div><div class="cd-lbl">phút</div></div>
             <div class="cd-item"><div class="cd-num" id="cd-s">--</div><div class="cd-lbl">giây</div></div>
           </div>
-          <div class="qr-field"><input type="text" placeholder="Họ và tên *"></div>
-          <div class="qr-field"><input type="tel" placeholder="Số điện thoại * (nhận link qua Zalo)"></div>
+          <div class="qr-field"><input type="text" id="reg-name" placeholder="Họ và tên *" autocomplete="name"><div class="field-error" id="err-reg-name"></div></div>
+          <div class="qr-field"><input type="tel" id="reg-phone" placeholder="Số điện thoại * (0987654321)" autocomplete="tel"><div class="field-error" id="err-reg-phone"></div></div>
           <button class="qr-submit" onclick="handleReg()">
             <svg class="icon" width="16" height="16" viewBox="0 0 24 24" stroke="white"><polyline points="20 6 9 17 4 12"/></svg>
             Đăng ký tham dự ngay
@@ -709,11 +721,20 @@ a{text-decoration:none;color:inherit}
       <p class="eyebrow center" style="color:rgba(255,255,255,.35)">Đăng ký</p>
       <h2>Còn 82 chỗ trống —<br>giữ chỗ của bạn ngay</h2>
       <p>Thứ 4, 22/04/2026 · 20:00–21:00 · Online · Miễn phí hoàn toàn</p>
-      <div class="cta-form">
-        <input type="tel" id="cta-phone" placeholder="Số điện thoại của bạn *">
-        <button class="btn btn-o btn-lg" onclick="handleRegCTA()">
+      <div class="cta-form-wrap" id="cta-form-wrap">
+        <div class="cta-field-row">
+          <div class="cta-field-group">
+            <input type="text" id="cta-name" placeholder="Họ và tên *" autocomplete="name">
+            <div class="field-error" id="err-cta-name"></div>
+          </div>
+          <div class="cta-field-group">
+            <input type="tel" id="cta-phone" placeholder="Số điện thoại * (0987654321)" autocomplete="tel">
+            <div class="field-error" id="err-cta-phone"></div>
+          </div>
+        </div>
+        <button class="btn btn-o btn-lg cta-submit-btn" onclick="handleRegCTA()">
           <svg class="icon" width="16" height="16" viewBox="0 0 24 24" stroke="white"><polyline points="20 6 9 17 4 12"/></svg>
-          Đăng ký
+          Đăng ký ngay
         </button>
       </div>
       <div class="cta-note">Admin liên hệ Zalo để gửi link Zoom · Không spam</div>
@@ -742,11 +763,170 @@ a{text-decoration:none;color:inherit}
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <script>
+// ════════════════════════════════
+// CONFIG — заполнить перед деплоем
+// ════════════════════════════════
+var API_CONFIG = {
+  endpoint: 'https://api.alohub.vn/api/flows/webhook/1731/tech-talk',
+  apiKey:   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NzU3MjA1NTEsImV4cCI6MTgwNzI1NjYxMSwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiYWRtaW4uYWxvaHViIiwiYXBpS2V5IjoidHFmZ2ZoaXRjcmJpcnhmbW5pbWtveHpmdXNubW1sIiwidGVuYW50SWQiOiIxNzMxIn0.fkMJbiJ7ZzgkrTHT5UpwfqjzI783iINKW18NELKE7wo',
+  nameField:  'name',
+  phoneField: 'phone'
+};
+
+// ════════════════════════════════
+// VALIDATION HELPERS
+// ════════════════════════════════
+var RE_PHONE = /^(0[3-9][0-9]{8}|84[3-9][0-9]{8})$/;
+
+function validateName(val) {
+  if (!val) return 'Vui lòng nhập họ và tên.';
+  if (val.length < 3) return 'Tên phải có ít nhất 3 ký tự.';
+  if (val.length > 20) return 'Tên không được quá 20 ký tự.';
+  return '';
+}
+function validatePhone(val) {
+  if (!val) return 'Vui lòng nhập số điện thoại.';
+  var clean = val.replace(/[\s\-\.]/g, '');
+  if (!RE_PHONE.test(clean)) return 'Số điện thoại không đúng định dạng (VD: 0987654321).';
+  return '';
+}
+function setFieldError(inputEl, errorEl, msg) {
+  if (msg) {
+    inputEl.classList.add('has-error');
+    errorEl.textContent = msg;
+  } else {
+    inputEl.classList.remove('has-error');
+    errorEl.textContent = '';
+  }
+  return msg === '';
+}
+
+// ════════════════════════════════
+// API SUBMIT
+// ════════════════════════════════
+function submitToAPI(name, phone, successCb, errorCb) {
+  var body = {};
+  body[API_CONFIG.nameField]  = name;
+  body[API_CONFIG.phoneField] = phone;
+  fetch(API_CONFIG.endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      'X-access-token': API_CONFIG.apiKey
+    },
+    body: JSON.stringify(body)
+  })
+  .then(function(res) {
+    if (res.ok) { successCb(); }
+    else { errorCb('Lỗi ' + res.status + '. Vui lòng thử lại.'); }
+  })
+  .catch(function() {
+    errorCb('Không kết nối được. Vui lòng thử lại.');
+  });
+}
+
+function showSuccess(container, msg) {
+  container.innerHTML =
+    '<div style="padding:20px;text-align:center">' +
+    '<div style="width:48px;height:48px;background:#ECFDF5;border:2px solid #6EE7B7;border-radius:50%;' +
+    'display:flex;align-items:center;justify-content:center;margin:0 auto 10px">' +
+    '<svg width="22" height="22" fill="none" stroke="#047857" stroke-width="2.5" stroke-linecap="round">' +
+    '<polyline points="20 6 9 17 4 12"/></svg></div>' +
+    '<div style="font-size:16px;font-weight:800;color:#1F2937;margin-bottom:5px">Đăng ký thành công!</div>' +
+    '<div style="font-size:13px;color:#4B5563;line-height:1.65">' + msg + '</div></div>';
+}
+
+// ════════════════════════════════
+// HERO FORM
+// ════════════════════════════════
+function handleReg() {
+  var nameEl  = document.getElementById('reg-name');
+  var phoneEl = document.getElementById('reg-phone');
+  var nameErr  = document.getElementById('err-reg-name');
+  var phoneErr = document.getElementById('err-reg-phone');
+
+  var nameVal  = nameEl  ? nameEl.value.trim()  : '';
+  var phoneVal = phoneEl ? phoneEl.value.trim() : '';
+
+  var ok = true;
+  ok = setFieldError(nameEl,  nameErr,  validateName(nameVal))  && ok;
+  ok = setFieldError(phoneEl, phoneErr, validatePhone(phoneVal)) && ok;
+  if (!ok) return;
+
+  var btn = document.querySelector('.qr-submit');
+  btn.textContent = 'Đang gửi...';
+  btn.disabled = true;
+
+  submitToAPI(nameVal, phoneVal,
+    function() {
+      showSuccess(document.querySelector('.reg-card-body'),
+        'Admin sẽ liên hệ Zalo để gửi link Zoom trước ngày 22/04. Nhớ thêm vào lịch nhé!');
+    },
+    function(errMsg) {
+      btn.innerHTML = '<svg class="icon" width="16" height="16" viewBox="0 0 24 24" stroke="white"><polyline points="20 6 9 17 4 12"/></svg> Đăng ký tham dự ngay';
+      btn.disabled = false;
+      document.getElementById('err-reg-phone').textContent = errMsg;
+    }
+  );
+}
+
+// Inline validation on blur
+document.addEventListener('DOMContentLoaded', function() {
+  var regName  = document.getElementById('reg-name');
+  var regPhone = document.getElementById('reg-phone');
+  if (regName)  regName.addEventListener('blur',  function() { setFieldError(this, document.getElementById('err-reg-name'),  validateName(this.value.trim())); });
+  if (regPhone) regPhone.addEventListener('blur',  function() { setFieldError(this, document.getElementById('err-reg-phone'), validatePhone(this.value.trim())); });
+
+  var ctaName  = document.getElementById('cta-name');
+  var ctaPhone = document.getElementById('cta-phone');
+  if (ctaName)  ctaName.addEventListener('blur',  function() { setFieldError(this, document.getElementById('err-cta-name'),  validateName(this.value.trim())); });
+  if (ctaPhone) ctaPhone.addEventListener('blur',  function() { setFieldError(this, document.getElementById('err-cta-phone'), validatePhone(this.value.trim())); });
+});
+
+// ════════════════════════════════
+// CTA BOTTOM FORM
+// ════════════════════════════════
+function handleRegCTA() {
+  var nameEl  = document.getElementById('cta-name');
+  var phoneEl = document.getElementById('cta-phone');
+  var nameErr  = document.getElementById('err-cta-name');
+  var phoneErr = document.getElementById('err-cta-phone');
+
+  var nameVal  = nameEl  ? nameEl.value.trim()  : '';
+  var phoneVal = phoneEl ? phoneEl.value.trim() : '';
+
+  var ok = true;
+  ok = setFieldError(nameEl,  nameErr,  validateName(nameVal))  && ok;
+  ok = setFieldError(phoneEl, phoneErr, validatePhone(phoneVal)) && ok;
+  if (!ok) return;
+
+  var btn = document.querySelector('.cta-submit-btn');
+  btn.textContent = 'Đang gửi...';
+  btn.disabled = true;
+
+  submitToAPI(nameVal, phoneVal,
+    function() {
+      showSuccess(document.getElementById('cta-form-wrap'),
+        'Admin sẽ liên hệ Zalo để gửi link Zoom.');
+    },
+    function(errMsg) {
+      btn.innerHTML = '<svg class="icon" width="16" height="16" viewBox="0 0 24 24" stroke="white"><polyline points="20 6 9 17 4 12"/></svg> Đăng ký ngay';
+      btn.disabled = false;
+      document.getElementById('err-cta-phone').textContent = errMsg;
+    }
+  );
+}
+
+// ════════════════════════════════
+// COUNTDOWN
+// ════════════════════════════════
 function updateCountdown() {
-  var target = new Date('2026-04-22T13:00:00Z'); // 20:00 ICT = 13:00 UTC
+  var target = new Date('2026-04-22T13:00:00Z'); // 20:00 ICT
   var diff = target - new Date();
   if (diff <= 0) {
-    document.getElementById('countdown').innerHTML = '<div style="color:#047857;font-weight:700;font-size:13px;text-align:center;padding:10px 0;grid-column:1/-1">Event đang diễn ra!</div>';
+    var el = document.getElementById('countdown');
+    if (el) el.innerHTML = '<div style="color:#047857;font-weight:700;font-size:13px;text-align:center;padding:10px 0;grid-column:1/-1">Event đang diễn ra!</div>';
     return;
   }
   var d = Math.floor(diff / 86400000);
@@ -761,30 +941,9 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-function handleReg() {
-  var name = document.querySelector('.qr-field input[type=text]').value.trim();
-  var tel  = document.querySelector('.qr-field input[type=tel]').value.trim();
-  if (!name || !tel) { alert('Vui lòng điền đầy đủ họ tên và số điện thoại.'); return; }
-  document.querySelector('.reg-card-body').innerHTML =
-    '<div style="padding:24px;text-align:center">' +
-    '<div style="width:52px;height:52px;background:#ECFDF5;border:2px solid #6EE7B7;border-radius:50%;' +
-    'display:flex;align-items:center;justify-content:center;margin:0 auto 12px">' +
-    '<svg width="24" height="24" fill="none" stroke="#047857" stroke-width="2.5" stroke-linecap="round">' +
-    '<polyline points="20 6 9 17 4 12"/></svg></div>' +
-    '<div style="font-size:17px;font-weight:800;color:#1F2937;margin-bottom:6px">Đăng ký thành công!</div>' +
-    '<div style="font-size:13px;color:#4B5563;line-height:1.65">' +
-    'Admin sẽ liên hệ Zalo để gửi link Zoom trước ngày 22/04. Nhớ thêm vào lịch nhé!</div></div>';
-}
-
-function handleRegCTA() {
-  var tel = document.getElementById('cta-phone').value.trim();
-  if (!tel) { alert('Vui lòng nhập số điện thoại.'); return; }
-  document.querySelector('.cta-form').outerHTML =
-    '<div style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:12px;' +
-    'padding:14px 24px;color:#86EFAC;font-weight:600;font-size:15px;text-align:center;max-width:480px;margin:0 auto">' +
-    'Đăng ký thành công! Admin sẽ liên hệ Zalo để gửi link Zoom.</div>';
-}
-
+// ════════════════════════════════
+// SCROLL ANIMATIONS
+// ════════════════════════════════
 var io = new IntersectionObserver(function(entries) {
   entries.forEach(function(en) {
     if (en.isIntersecting) {
@@ -798,3 +957,5 @@ document.querySelectorAll('.topic-item,.why-card,.speaker-card,.agenda-item,.hoo
   io.observe(el);
 });
 </script>
+</body>
+</html>
